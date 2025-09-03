@@ -45,23 +45,17 @@ LIMIT 10
 Solution:
 ```
 %%sql
-SELECT seller_stats.seller_name
-FROM (
-    SELECT 
-        s.s_name AS seller_name,
-        p.p_name AS part_name,
-        SUM(l.l_quantity) AS part_total
-    FROM prod.db.lineitem l
-    JOIN prod.db.partsupp ps
-    ON l.l_partkey = ps.ps_partkey AND l.l_suppkey = ps.ps_suppkey
-    JOIN prod.db.supplier s
-    ON ps.ps_suppkey = s.s_suppkey
-    JOIN prod.db.part p
-    ON ps.ps_partkey = p.p_partkey
-    GROUP BY p.p_name, s.s_name
-    ORDER BY part_total DESC
-    LIMIT 10) AS seller_stats
-GROUP BY seller_stats.seller_name
+SELECT 
+        s.s_name AS supplier_name, 
+        SUM(l.l_quantity) AS item_total
+FROM prod.db.lineitem l
+JOIN prod.db.partsupp ps
+ON l.l_partkey = ps.ps_partkey AND l.l_suppkey = ps.ps_suppkey
+JOIN prod.db.supplier s
+ON ps.ps_suppkey = s.s_suppkey
+GROUP BY s.s_name, ps.ps_partkey
+ORDER BY item_total DESC
+LIMIT 10
 ```
 
 4. Number of items returned for each order price bucket. The definition of order price
